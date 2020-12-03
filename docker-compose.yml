@@ -1,0 +1,53 @@
+version: '3.7'
+services:
+  nginx:
+    container_name: bereqnginx
+    image: nginx:1.15-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./source:/var/www/html/requerimiento:delegated
+      - ./etc/infrastructure/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+
+  databasebe:
+    image: mysql:5.7
+    container_name: databasebe
+    hostname: databasebe
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=toor
+      - MYSQL_DATABASE=sistemabe
+      - MYSQL_USER=sistemabe
+      - MYSQL_PASSWORD=vass
+    ports:
+      - "3306:3306"
+    volumes:
+      - ~/database/storage/mariadb/vass/sistemabe/:/var/lib/mysql:rw
+      - ./database/sql/:/home/mysql/sql/:rw
+
+  php:
+    build:
+      context: .
+      dockerfile: ./docker/php/70/Dockerfile
+    container_name: be
+    hostname: be
+    restart: always
+    environment:
+      - "DOCKER_USER=www-data"
+      - XDEBUG_CONFIG="remote_host=172.17.0.1"
+    ports:
+      - "9000:9000"
+    depends_on:
+      - databasebe
+      - cache
+    volumes:
+      - ./source:/var/www/html/requerimiento:delegated
+
+  cache:
+    image: redis:alpine
+    hostname: cache
+    ports:
+      - "6379:6379"
