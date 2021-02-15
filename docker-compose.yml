@@ -26,6 +26,7 @@ services:
       - "3306:3306"
     volumes:
       - ~/database/storage/mariadb/vass/sistemabe/:/var/lib/mysql:rw
+      - ./etc/infrastructure/mysql/conf.d/gateway.cnf:/etc/mysql/conf.d/gateway.cnf
       - ./database/sql/:/home/mysql/sql/:rw
 
   php:
