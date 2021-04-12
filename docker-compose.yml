@@ -7,7 +7,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./source:/var/www/html/requerimiento:delegated
+      - /opt/projects/vass/bancoEstado/:/var/www/html/requerimiento:delegated
       - ./etc/infrastructure/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - php
@@ -34,18 +34,22 @@ services:
       context: .
       dockerfile: ./docker/php/70/Dockerfile
     container_name: be
+    deploy:
+        resources:
+            limits:
+                cpus: '6'
     hostname: be
     restart: always
     environment:
       - "DOCKER_USER=www-data"
-      - XDEBUG_CONFIG="remote_host=172.17.0.1"
+      - XDEBUG_CONFIG="remote_host=172.17.0.1, 192.168.0.107, 192.168.0.101"
     ports:
       - "9000:9000"
     depends_on:
       - databasebe
       - cache
     volumes:
-      - ./source:/var/www/html/requerimiento:delegated
+      - /opt/projects/vass/bancoEstado/:/var/www/html/requerimiento:delegated
 
   cache:
     image: redis:alpine
